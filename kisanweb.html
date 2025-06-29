@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Kisan - Interactive Plan</title>
+    <!-- Chosen Palette: Earthy Harmony -->
+    <!-- Application Structure Plan: The application transforms the linear report into a non-linear, interactive dashboard. The goal is to allow stakeholders (like hackathon judges) to quickly grasp the project's essence and dive into sections of interest. It uses a sticky top navigation for easy access to key areas like 'The Problem', 'Solution', 'Features', 'Technology', 'Impact', and 'The Plan'. This structure is more engaging than a simple document scroll. Key interactions include tabbed interfaces for detailed features to prevent information overload, and visual diagrams built with HTML/CSS for the architecture and timeline, making complex information digestible. This user-flow prioritizes discovery and clarity over the report's original sequence. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Project Architecture -> Goal: Organize -> Viz/Method: HTML/CSS Diagram -> Interaction: Static visual clarity -> Justification: Clearly illustrates the tech stack and data flow without complex graphics.
+        - Report Info: Key Features -> Goal: Inform/Compare -> Viz/Method: JS-powered Tabs -> Interaction: Click to reveal details -> Justification: Organizes dense feature information cleanly, allowing users to focus on one feature at a time.
+        - Report Info: MVP Timeline -> Goal: Change/Process -> Viz/Method: Chart.js Bar Chart -> Interaction: Hover for details -> Justification: Visually represents the allocation of work across the MVP phases in a quantifiable, easy-to-compare format.
+        - Report Info: Impact & Scalability -> Goal: Inform -> Viz/Method: Styled Cards & Text -> Interaction: On-scroll reveal -> Justification: Presents qualitative benefits in a visually appealing, digestible format.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FBF9F4;
+            color: #4A4A4A;
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-bottom-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #2C522D;
+            border-bottom-color: #2C522D;
+        }
+        .tab-button.active {
+            background-color: #2C522D;
+            color: #FFFFFF;
+        }
+        .card-enter {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .card-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 800px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .arch-box {
+            border: 1px solid #D1D5DB;
+            background-color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+        .arch-arrow {
+            position: relative;
+            text-align: center;
+            font-size: 1.5rem;
+            color: #6B7280;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="sticky top-0 bg-white/80 backdrop-blur-md z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-[#2C522D]">Project Kisan</h1>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#problem" class="nav-link font-medium pb-1">The Problem</a>
+                    <a href="#solution" class="nav-link font-medium pb-1">Solution</a>
+                    <a href="#features" class="nav-link font-medium pb-1">Features</a>
+                    <a href="#tech" class="nav-link font-medium pb-1">Technology</a>
+                    <a href="#impact" class="nav-link font-medium pb-1">Impact</a>
+                    <a href="#plan" class="nav-link font-medium pb-1">The Plan</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-btn" class="text-gray-700 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+             <div id="mobile-menu" class="hidden md:hidden mt-4 flex flex-col space-y-2">
+                <a href="#problem" class="nav-link text-center py-1">The Problem</a>
+                <a href="#solution" class="nav-link text-center py-1">Solution</a>
+                <a href="#features" class="nav-link text-center py-1">Features</a>
+                <a href="#tech" class="nav-link text-center py-1">Technology</a>
+                <a href="#impact" class="nav-link text-center py-1">Impact</a>
+                <a href="#plan" class="nav-link text-center py-1">The Plan</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="bg-white">
+            <div class="container mx-auto px-6 py-20 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 leading-tight">Empowering India's Farmers with AI</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">An AI-powered personal assistant providing crop disease diagnosis, market analysis, and government scheme navigation through voice in local languages.</p>
+                <a href="#solution" class="mt-8 inline-block bg-[#2C522D] text-white font-bold py-3 px-8 rounded-full hover:bg-[#3a6d3b] transition-colors duration-300">Discover the Solution</a>
+            </div>
+        </section>
+
+        <section id="problem" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-800">The Farmer's Challenge</h3>
+                    <p class="mt-2 text-gray-600">We started with a simple, powerful user story.</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto border border-gray-200">
+                    <p class="text-xl italic text-gray-700 leading-relaxed text-center">
+                        "As a small-scale farmer in rural India, I struggle with identifying crop diseases, understanding volatile market prices, and accessing complex government schemes, often due to language barriers, limited literacy, and lack of internet access. I need an easy-to-use, reliable, and localized source of information that helps me make informed decisions to improve my yield and income."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="solution" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-800">Our Solution: A Voice-First AI Assistant</h3>
+                    <p class="mt-2 text-gray-600 max-w-3xl mx-auto">Project Kisan is an accessible, voice-first AI assistant designed to provide real-time, localized information, enhancing agricultural productivity and economic well-being for small-scale Indian farmers.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8 text-center">
+                    <div class="card-enter p-6 border rounded-lg hover:shadow-xl transition-shadow duration-300">
+                        <div class="text-4xl mb-4 text-[#2C522D]">🌿</div>
+                        <h4 class="text-xl font-semibold mb-2">Crop Disease Diagnosis</h4>
+                        <p class="text-gray-600">Identify crop diseases instantly using voice descriptions and photos, receiving actionable remedies.</p>
+                    </div>
+                    <div class="card-enter p-6 border rounded-lg hover:shadow-xl transition-shadow duration-300">
+                         <div class="text-4xl mb-4 text-[#2C522D]">📈</div>
+                        <h4 class="text-xl font-semibold mb-2">Market Trend Analysis</h4>
+                        <p class="text-gray-600">Get daily local market prices and trend insights to sell produce at the optimal time and price.</p>
+                    </div>
+                    <div class="card-enter p-6 border rounded-lg hover:shadow-xl transition-shadow duration-300">
+                        <div class="text-4xl mb-4 text-[#2C522D]">📜</div>
+                        <h4 class="text-xl font-semibold mb-2">Scheme Navigation</h4>
+                        <p class="text-gray-600">Discover and understand relevant government schemes with clear eligibility and application guidance.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="features" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-800">Interactive Features</h3>
+                     <p class="mt-2 text-gray-600 max-w-3xl mx-auto">This section details the core functionalities of Project Kisan. Click on each tab to explore how we leverage Google's AI to build each feature, creating a comprehensive and intelligent tool for farmers.</p>
+                </div>
+                <div>
+                    <div class="mb-8 flex justify-center border-b border-gray-200">
+                        <button data-tab="diagnosis" class="tab-button text-lg font-medium py-3 px-6 rounded-t-lg active">Diagnosis</button>
+                        <button data-tab="market" class="tab-button text-lg font-medium py-3 px-6 rounded-t-lg">Market Analysis</button>
+                        <button data-tab="schemes" class="tab-button text-lg font-medium py-3 px-6 rounded-t-lg">Schemes</button>
+                    </div>
+                    <div id="tab-content" class="bg-white p-8 rounded-lg shadow-md border border-gray-100">
+                        <div id="diagnosis-content" class="tab-pane active">
+                            <h4 class="text-2xl font-bold text-gray-800 mb-4">AI-Powered Crop Disease Diagnosis</h4>
+                            <p class="text-gray-600 mb-6">Farmers can describe symptoms verbally or upload an image of a diseased plant. The system uses multimodal AI to identify the disease and suggests effective, accessible remedies.</p>
+                            <div class="bg-green-50 p-6 rounded-lg border border-green-200">
+                                <h5 class="font-semibold text-lg text-green-800 mb-2">Google AI Implementation:</h5>
+                                <ul class="list-disc list-inside text-green-700 space-y-2">
+                                    <li><strong class="font-medium">Gemini Pro (Multimodal):</strong> Processes both voice descriptions (via Speech-to-Text) and uploaded images simultaneously for a highly accurate diagnosis.</li>
+                                    <li><strong class="font-medium">Retrieval Augmented Generation (RAG):</strong> Gemini references a curated knowledge base of remedies stored in Cloud Storage for relevant and safe suggestions.</li>
+                                    <li><strong class="font-medium">Vertex AI Vision (Optional):</strong> A custom model can be trained on specific local disease datasets for even higher accuracy on niche problems.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="market-content" class="tab-pane hidden">
+                             <h4 class="text-2xl font-bold text-gray-800 mb-4">Real-Time Market Trend Analysis</h4>
+                            <p class="text-gray-600 mb-6">Provides daily market prices for specific crops, analyzes trends, and offers insights on optimal selling times to maximize farmer profits.</p>
+                             <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                                <h5 class="font-semibold text-lg text-blue-800 mb-2">Google AI Implementation:</h5>
+                                <ul class="list-disc list-inside text-blue-700 space-y-2">
+                                    <li><strong class="font-medium">Cloud Functions:</strong> Trigger scripts to ingest daily commodity prices from sources like AGMARKNET.</li>
+                                    <li><strong class="font-medium">BigQuery & Firestore:</strong> Store historical data for trend analysis (BigQuery) and provide quick access to daily prices (Firestore).</li>
+                                    <li><strong class="font-medium">Gemini Pro:</strong> Synthesizes trend data into simple, actionable advice delivered to the farmer in their local language via Text-to-Speech.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="schemes-content" class="tab-pane hidden">
+                            <h4 class="text-2xl font-bold text-gray-800 mb-4">Simplified Government Scheme Navigation</h4>
+                            <p class="text-gray-600 mb-6">Helps farmers discover relevant agricultural schemes, explains complex eligibility criteria, and guides them through the application process in simple terms.</p>
+                             <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
+                                <h5 class="font-semibold text-lg text-yellow-800 mb-2">Google AI Implementation:</h5>
+                                <ul class="list-disc list-inside text-yellow-700 space-y-2">
+                                     <li><strong class="font-medium">Vertex AI Embeddings:</strong> Create embeddings from government scheme documents stored in Cloud Storage to make them searchable.</li>
+                                     <li><strong class="font-medium">RAG with Gemini Pro:</strong> Gemini uses the most relevant document snippets to answer farmer queries accurately and conversationally.</li>
+                                     <li><strong class="font-medium">Firestore Personalization:</strong> Stores farmer profiles (e.g., land size, crops) to filter and suggest only the most relevant schemes.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tech" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-800">Technology Architecture</h3>
+                    <p class="mt-2 text-gray-600 max-w-3xl mx-auto">This diagram illustrates the flow of information in Project Kisan. It shows how a farmer's voice or image input is processed through Firebase and Google's powerful AI services to deliver an intelligent, spoken response, creating a seamless interactive loop.</p>
+                </div>
+                <div class="max-w-4xl mx-auto bg-gray-50 p-8 rounded-lg border">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                        <div class="space-y-4">
+                            <div class="arch-box">🎤 Farmer Voice Input</div>
+                            <div class="arch-box">🖼️ Farmer Image Upload</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="arch-arrow">→</div>
+                        </div>
+                        <div class="arch-box bg-red-100 border-red-200">
+                           <strong class="text-red-800">Firebase Platform</strong>
+                           <p class="text-sm text-red-600">(Auth, Hosting, Functions, Storage, Firestore)</p>
+                        </div>
+                    </div>
+                    <div class="text-center my-4 arch-arrow">↓</div>
+                     <div class="arch-box bg-blue-100 border-blue-200">
+                        <strong class="text-blue-800">Google Cloud AI Services</strong>
+                        <p class="text-sm text-blue-600">(Gemini, Vertex AI, STT/TTS, BigQuery)</p>
+                     </div>
+                     <div class="text-center my-4 arch-arrow">↓</div>
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                        <div class="arch-box bg-green-100 border-green-200">
+                            <strong class="text-green-800">Intelligent Response</strong>
+                        </div>
+                         <div class="text-center">
+                            <div class="arch-arrow">→</div>
+                        </div>
+                         <div class="space-y-4">
+                            <div class="arch-box">🔊 Spoken Answer</div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="impact" class="py-20">
+             <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-800">Impact & Scalability</h3>
+                     <p class="mt-2 text-gray-600 max-w-3xl mx-auto">Project Kisan is designed not just as a tool, but as a catalyst for change. Here, we outline the project's potential to significantly improve farmers' livelihoods and its built-in capacity to grow and adapt for a wider reach.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <h4 class="text-2xl font-semibold mb-6 text-center">Potential Impact</h4>
+                        <div class="space-y-6">
+                             <div class="card-enter bg-white p-6 rounded-lg shadow-sm border flex items-center">
+                                <span class="text-3xl mr-4">💰</span>
+                                <div>
+                                    <h5 class="font-semibold">Increased Income</h5>
+                                    <p class="text-gray-600">Prevent crop loss and optimize selling prices through timely, data-driven advice.</p>
+                                </div>
+                             </div>
+                             <div class="card-enter bg-white p-6 rounded-lg shadow-sm border flex items-center">
+                                <span class="text-3xl mr-4">🧑‍🌾</span>
+                                 <div>
+                                    <h5 class="font-semibold">Farmer Empowerment</h5>
+                                    <p class="text-gray-600">Enable informed decision-making, reducing reliance on potentially exploitative intermediaries.</p>
+                                </div>
+                             </div>
+                             <div class="card-enter bg-white p-6 rounded-lg shadow-sm border flex items-center">
+                                <span class="text-3xl mr-4">🌍</span>
+                                 <div>
+                                    <h5 class="font-semibold">Bridged Information Gap</h5>
+                                    <p class="text-gray-600">Make complex government schemes and market data accessible and understandable to all.</p>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-semibold mb-6 text-center">Scalability Roadmap</h4>
+                         <div class="space-y-6">
+                            <div class="card-enter bg-white p-6 rounded-lg shadow-sm border flex items-center">
+                                <span class="text-3xl mr-4">🗣️</span>
+                                 <div>
+                                    <h5 class="font-semibold">Language Expansion</h5>
+                                    <p class="text-gray-600">Easily add more Indian languages and dialects using Google's powerful STT/TTS APIs.</p>
+                                </div>
+                             </div>
+                             <div class="card-enter bg-white p-6 rounded-lg shadow-sm border flex items-center">
+                                <span class="text-3xl mr-4">➕</span>
+                                 <div>
+                                    <h5 class="font-semibold">Feature Growth</h5>
+                                    <p class="text-gray-600">Incorporate new features like weather advisories, soil health tips, and community forums.</p>
+                                </div>
+                             </div>
+                             <div class="card-enter bg-white p-6 rounded-lg shadow-sm border flex items-center">
+                                <span class="text-3xl mr-4">☁️</span>
+                                 <div>
+                                    <h5 class="font-semibold">Cloud Infrastructure</h5>
+                                    <p class="text-gray-600">Leverage Firebase and GCP's serverless architecture to support millions of users seamlessly.</p>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="plan" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-800">The Hackathon Plan</h3>
+                    <p class="mt-2 text-gray-600 max-w-3xl mx-auto">Our development is structured into three clear phases to build a functional Minimum Viable Product (MVP) during the hackathon. This chart visualizes the focus for each phase, ensuring we deliver on our core features efficiently.</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="mvpTimelineChart"></canvas>
+                </div>
+                 <div class="mt-12">
+                    <h4 class="text-2xl font-semibold mb-6 text-center">Risks & Mitigations</h4>
+                    <div class="max-w-4xl mx-auto space-y-4">
+                        <div class="card-enter bg-gray-50 p-4 rounded-lg border grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><strong class="font-semibold">Risk:</strong> AI model inaccuracy.</div>
+                            <div><strong class="text-green-700">Mitigation:</strong> Rigorous prompt engineering, show confidence scores, and advise consulting local experts.</div>
+                        </div>
+                        <div class="card-enter bg-gray-50 p-4 rounded-lg border grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><strong class="font-semibold">Risk:</strong> Poor rural internet connectivity.</div>
+                            <div><strong class="text-green-700">Mitigation:</strong> Build as a Progressive Web App (PWA) with offline capabilities and optimize for low bandwidth.</div>
+                        </div>
+                         <div class="card-enter bg-gray-50 p-4 rounded-lg border grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><strong class="font-semibold">Risk:</strong> Low user adoption/digital literacy.</div>
+                            <div><strong class="text-green-700">Mitigation:</strong> Extreme focus on simple, voice-first design. Conduct user testing and partner with local NGOs for outreach.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p class="font-bold text-xl">Project Kisan</p>
+            <p class="mt-2 text-gray-400">An AI for Bharat Hackathon Idea</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                     if(!mobileMenu.classList.contains('hidden')){
+                        mobileMenu.classList.add('hidden');
+                     }
+                });
+            });
+
+            const sections = document.querySelectorAll('section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        document.querySelectorAll('.nav-link').forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-30% 0px -70% 0px" });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            const tabs = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(item => item.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    const target = tab.getAttribute('data-tab');
+                    
+                    tabPanes.forEach(pane => {
+                        if (pane.id === `${target}-content`) {
+                            pane.classList.remove('hidden');
+                            pane.classList.add('active');
+                        } else {
+                            pane.classList.add('hidden');
+                            pane.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            const cardObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('card-enter-active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.card-enter').forEach(card => {
+                cardObserver.observe(card);
+            });
+            
+            const chartCtx = document.getElementById('mvpTimelineChart').getContext('2d');
+            new Chart(chartCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Phase 1: Setup & Core Integration', 'Phase 2: Feature Implementation', 'Phase 3: Refinement & Demo Prep'],
+                    datasets: [{
+                        label: 'Core Setup Effort',
+                        data: [60, 20, 20],
+                        backgroundColor: 'rgba(44, 82, 45, 0.6)',
+                        borderColor: 'rgba(44, 82, 45, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Feature Dev Effort',
+                        data: [20, 60, 20],
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'UI/UX & Polish Effort',
+                        data: [20, 20, 60],
+                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                             ticks: {
+                                callback: function(value) { return value + "%" }
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'MVP Development Effort Allocation by Phase',
+                            font: { size: 18, weight: 'bold' },
+                            padding: { top: 10, bottom: 30 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+        });
+    </script>
+
+</body>
+</html>
